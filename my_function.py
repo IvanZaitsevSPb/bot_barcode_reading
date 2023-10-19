@@ -7,17 +7,28 @@ from pyzbar.pyzbar import decode
 def BarcodeReader(image):
     # Считывание изображения в массиве numpy, используя cv2
     img = cv2.imread(image)
-
+    result = []
     # Декодирование штрих кода
     detectedBarcodes = decode(img)
 
-    # Проверка корректности чтения штрих кодов
-    if len(detectedBarcodes) == 2:
+    if len(detectedBarcodes) == 2 and (len(detectedBarcodes[1][0].decode('utf-8')) == 16 or len(detectedBarcodes[0][0].decode('utf-8')) == 16):
         if len(detectedBarcodes[1][0].decode('utf-8')) == 16:
-            return f"Cерийный номер: {detectedBarcodes[0][0].decode('utf-8')}\n"\
-                   f"MAC: {detectedBarcodes[1][0].decode('utf-8')}"
+            return f"Cерийный номер: <code>{detectedBarcodes[0][0].decode('utf-8')} </code>\n"\
+                   f"MAC: <code> {detectedBarcodes[1][0].decode('utf-8')} </code>"
         else:
-            return f"Cерийный номер: {detectedBarcodes[1][0].decode('utf-8')}\n" \
-                   f"MAC: {detectedBarcodes[0][0].decode('utf-8')}"
-    else:
-        return f"Загрузите фотографию заново пожалуйста, штрих коды не считались!"
+            return f"Cерийный номер: <code>{detectedBarcodes[1][0].decode('utf-8')}</code>\n" \
+                   f"MAC:<code> {detectedBarcodes[0][0].decode('utf-8')}</code>"
+    elif len(detectedBarcodes) == 1 and len(detectedBarcodes[0][0]) == 18:
+        return f"ICCID: <code>{detectedBarcodes[0][0].decode('utf-8')}</code>\n"
+    elif len(detectedBarcodes) == 3:
+        return f"<code>{detectedBarcodes[0][0].decode('utf-8')}</code>\n" \
+               f"<code> {detectedBarcodes[1][0].decode('utf-8')}</code>\n" \
+               f"<code> {detectedBarcodes[2][0].decode('utf-8')}</code>"
+    elif len(detectedBarcodes) == 2:
+        return f"<code>{detectedBarcodes[0][0].decode('utf-8')}</code>\n" \
+               f"<code> {detectedBarcodes[1][0].decode('utf-8')}</code>"
+    elif len(detectedBarcodes) == 1:
+        return f"<code>{detectedBarcodes[0][0].decode('utf-8')}</code>\n"
+
+
+
